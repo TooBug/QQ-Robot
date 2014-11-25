@@ -1,0 +1,107 @@
+<!doctype html>
+<head>
+<meta charset="utf-8" />
+<title>QQ</title>
+<style>
+*{margin:0;padding:0;}
+html,body{height:100%;}
+body{overflow:hidden;}
+iframe{width:100%;height:100%;}
+</style>
+<script src="./apikey.js"></script>
+</head>
+<body>
+<iframe src="http://w.qq.com" border="0"></iframe>
+<script>
+	/*global console,require*/
+	'use strict';
+	window.onload = function(){
+		setInterval(updateQQMsg,1000);
+	};
+	var lastIndex = -1;
+	var qqDoc;
+	var canHandle = true;
+	function updateQQMsg(){
+		if(!qqDoc){
+			qqDoc = document.querySelector('iframe').contentDocument;
+		}else{
+			var msgDom = qqDoc.querySelectorAll('.chat_content');
+			for(var i=lastIndex+1;i<msgDom.length;i++){
+				var content = msgDom[i].innerText;
+				var nick = qqDoc.querySelectorAll('.chat_nick')[i].innerText;
+				lastIndex = i;
+				if(/【(?:每日|伪)福利】/.test(content) && /已记录。/.test(content)){
+					return;
+				}
+				if(/@闭嘴/.test(content) || /@no\-TooSolo/i.test(content)){
+					reply('我就看看，闭嘴就闭嘴……');
+					return;
+				}
+				console.log(content);
+				if(/((https?:\/\/|www\.)[\w_\.\/\%\&\?\-=:#]+)/.test(content)){
+					var logContent = '';
+					if(/#每日福利#/.test(content)){
+						logContent = '【每日福利】';
+					}else{
+						logContent = '【伪福利】';
+					}
+					logContent += content.replace(/((https?:\/\/|www\.)[\w_\.\/\%\&\?\-=:#]+)/,function(string,url,prefix) {
+						var realUrl = url;
+						if(prefix === 'www.'){
+							realUrl = 'http://'+url;
+						}
+					    return '<'+url+'>';
+					});
+					var fs = require('fs');
+					fs.appendFileSync('./log.txt',logContent + '\n');
+					reply(logContent + '\n已记录。');
+					console.log(logContent);
+				}else if(/@toosolo/i.test(content) || Math.random() < 0.1){
+					if(canHandle){
+						if(/自定义/.test(content)){
+							reply('看不懂……我还是卖萌好了。:)');
+						}else{
+							var url = 'http://www.tuling123.com/openapi/api?key='+window.apikey+'&userid='+encodeURI(nick)+'&info='+encodeURI(content.replace(/@toosolo/i,''));
+							ajax(url,function(msg){
+								reply(msg);
+							});
+						}
+					}else if(/@toosolo/i.test(content)){
+						reply('夫君，臣妾是真的好累……');
+					}
+				}
+			}
+		}
+	}
+
+	function reply(msg){
+		qqDoc.querySelector('#chat_textarea').value = msg;
+		setTimeout(function(){
+			qqDoc.querySelector('#send_chat_btn').click();
+		},100);
+	}
+
+	function ajax(url,callback){
+		var xmlhttp=new XMLHttpRequest();
+		xmlhttp.onreadystatechange=function(){
+			if (xmlhttp.readyState==4 && xmlhttp.status==200){
+				var replyMsg = JSON.parse(xmlhttp.responseText);
+				if(replyMsg.code >= 100000){
+					var msg = replyMsg.text;
+					if(replyMsg.url){
+						msg += replyMsg.url;
+					}
+					callback(msg);
+				}else if(replyMsg.result == 509){
+					canHandle = false;
+					callback('臣妾累了，改日再侍候夫君～');
+				}
+			}
+		};
+		xmlhttp.open('GET',url,true);
+		xmlhttp.send(null);
+	}
+
+</script>
+</body>
+</html>

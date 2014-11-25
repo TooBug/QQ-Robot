@@ -1,0 +1,12 @@
+{
+	"name":"windsor",
+	"main":"index.html",
+	"window":{
+		//"frame":false,
+		//"toolbar":false,
+		"resizable":true,
+		"width":300,
+		"height":400
+	}
+}
+
