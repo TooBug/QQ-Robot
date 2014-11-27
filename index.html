@@ -56,19 +56,11 @@ iframe{width:100%;height:100%;}
 					fs.appendFileSync('./log.txt',logContent + '\n');
 					reply(logContent + '\n已记录。');
 					console.log(logContent);
-				}else if(/@toosolo/i.test(content) || Math.random() < 0.1){
-					if(canHandle){
-						if(/自定义/.test(content)){
-							reply('看不懂……我还是卖萌好了。:)');
-						}else{
-							var url = 'http://www.tuling123.com/openapi/api?key='+window.apikey+'&userid='+encodeURI(nick)+'&info='+encodeURI(content.replace(/@toosolo/i,''));
-							ajax(url,function(msg){
-								reply(msg);
-							});
-						}
-					}else if(/@toosolo/i.test(content)){
-						reply('夫君，臣妾是真的好累……');
-					}
+				}else if(/@toosolo/i.test(content) && !/toosolo/i.test(nick)){
+					var url = 'http://www.tuling123.com/openapi/api?key='+window.apikey+'&userid='+encodeURI(nick)+'&info='+encodeURI(content.replace(/@toosolo/i,''));
+					ajax(url,function(msg){
+						reply(msg);
+					});
 				}
 			}
 		}
@@ -92,9 +84,6 @@ iframe{width:100%;height:100%;}
 						msg += replyMsg.url;
 					}
 					callback(msg);
-				}else if(replyMsg.result == 509){
-					canHandle = false;
-					callback('臣妾累了，改日再侍候夫君～');
 				}
 			}
 		};
