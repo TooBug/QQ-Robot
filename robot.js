@@ -140,12 +140,10 @@ robot.replyMessage = function(message){
 };
 
 robot.run = function(){
-	console.log('robot.run()');
 	setInterval(robot.check,1000);
 };
 
 robot.check = function(){
-	console.log('robot.check()');
 	if(!robot._qqDoc){
 		robot._qqDoc = document.querySelector('iframe').contentDocument;
 	}else{
