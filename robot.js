@@ -105,15 +105,17 @@ robot.parseMessage = function(content, nick, uid){
 		'@撤回','@撤销'
 	];
 	var command;
-	if(helper.testUrl(content)){
+
+	keywords.forEach(function(keyword){
+		if(content.toLowerCase().indexOf(keyword) > -1){
+			command = keyword.substr(1);
+		}
+	});
+
+	if(!command && helper.testUrl(content)){
 		command = '福利';
-	}else{
-		keywords.forEach(function(keyword){
-			if(content.toLowerCase().indexOf(keyword) > -1){
-				command = keyword.substr(1);
-			}
-		});
 	}
+	
 	var ret;
 	if(command){
 		ret = {
