@@ -19,9 +19,68 @@ iframe{width:100%;height:100%;}
 	window.onload = function(){
 		setInterval(updateQQMsg,1000);
 	};
+	String.prototype.trim=function() {  
+		return this.replace(/(^\s*)|(\s*$)/g,'');  
+	};
 	var lastIndex = -1;
 	var qqDoc;
 	var canHandle = true;
+	// 正则命令判断
+	function reg(command, title, end) {
+		if (title == null) {
+		title = "@";
+		}
+		return new RegExp(title + command, end);
+	};
+	// 根据关键词查询
+	function readAllOldFiles(title,time) {
+		if ((title == null) || title === "" || title.length < 2) {
+		return false;
+		}
+		var fs,searchfile,alreadyRead,checkFinished;
+		var files = [];
+		var bkcontent = "查询结果:\n";
+		alreadyRead = 1;
+		fs = require("fs");
+		fs.readdir("./daily-welfare", function(err, fd) {
+			console.log(err,fd);
+			for (var file in fd) {
+				if (reg(".md$","").test(fd[file])){
+					files.push(fd[file]);
+					searchfile(fd[file],title);
+				}
+		  }
+		});
+		searchfile = function(name,title) {
+			title = title.trim().split(",");
+			fs.readFile("./daily-welfare/"+name,function(err,data){
+				var lines = data.toString().split('\n');
+				for (var t in lines) {
+					var line = lines[t];
+					// line.toLowerCase().indexOf(title) > -1 && 
+					if (line[0] == "-") {
+						var keyword = [];
+						for (var k in title) {
+							if (line.toLowerCase().indexOf(title[k]) > -1) {
+								keyword.push("true");
+							}
+						}
+						if (keyword.length == title.length) {
+							bkcontent += line.replace("- [","").replace("](","\n").replace(")","")+"\n";
+						}
+					}
+				}
+				alreadyRead++
+				checkFinished()
+			});
+		}
+		checkFinished = function() {
+			if (alreadyRead === files.length) {
+				reply(bkcontent);
+				console.log(new Date().getTime()-time);
+			}
+		}
+	};
 	function updateQQMsg(){
 		if(!qqDoc){
 			qqDoc = document.querySelector('iframe').contentDocument;
@@ -39,6 +98,14 @@ iframe{width:100%;height:100%;}
 					return;
 				}
 				console.log(content);
+				// 增加查询曾经加入到每日福利中的链接
+				if (reg("查询结果:","").test(content)) {
+					return;
+				}
+				if (reg("old").test(content)) {
+					var title = content.replace("@old","");
+					readAllOldFiles(title,new Date().getTime());
+				};
 				if(/((https?:\/\/|www\.)[\w_\.\/\%\&\?\-=:#]+)/.test(content)){
 					var logContent = '';
 					if(/#每日福利#/.test(content)){
@@ -51,7 +118,7 @@ iframe{width:100%;height:100%;}
 						if(prefix === 'www.'){
 							realUrl = 'http://'+url;
 						}
-					    return '<'+realUrl+'>';
+					return '<'+realUrl+'>';
 					});
 					var fs = require('fs');
 					fs.appendFileSync('./log.txt',logContent + '\n');
@@ -91,7 +158,7 @@ iframe{width:100%;height:100%;}
 		xmlhttp.open('GET',url,true);
 		xmlhttp.send(null);
 	}
-
+	
 </script>
 </body>
 </html>
