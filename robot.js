@@ -156,6 +156,8 @@ robot.check = function(){
 			
 			robot._lastIndex = i;
 
+			if(uid === robot._selfUid) return;
+
 			var parseResult = robot.parseMessage(content,nick,uid);
 
 			robot.replyMessage(parseResult);
@@ -171,7 +173,7 @@ robot.commands.聊天 = function(content,nick,uid,callback){
 		window.apikey + '&userid=' + encodeURI(uid) +
 		'&info='+encodeURI(content);
 	helper.ajax(url,function(msg){
-		callback(msg);
+		callback('@' + 'nick ' + msg);
 	});
 };
 robot.commands.toosolo = robot.commands.聊天;
