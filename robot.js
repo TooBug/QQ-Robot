@@ -47,8 +47,10 @@ helper.fs.setLogFolder = function(folderName){
 
 helper.fs.getCurrentFileName = function(){
 	var today = new Date();
+	var year = today.getFullYear();
+	var month = today.getMonth() + 1;
 	var path = require('path');
-	return path.join(this._folder,today.getFullYear() + '-' + (today.getMonth()+1) + '.md');
+	return path.join(this._folder,year + (month < 10?'0':'') + month + '.md');
 };
 
 helper.fs.writeLine = function(content){
@@ -180,7 +182,7 @@ robot.commands.天气 = function(content,nick,uid,callback){
 };
 
 robot.commands.福利 = function(content,nick,uid,callback){
-	var logContent = '';
+	var logContent = nick + '(' + uid + '):';
 	if(/#每日福利#/.test(content)){
 		logContent = '【每日福利】';
 	}
