@@ -9,9 +9,9 @@ helper.testUrl = function(str){
 };
 helper.wrapUrl = function(str,prefix,postfix){
 	var urlRegExp = /((https?:\/\/|www\.)[\w_\.\/\%\&\?\-=:#]+)/g;
-	return str.replace(urlRegExp,function(string,url,prefix) {
+	return str.replace(urlRegExp,function(string,url,urlPrefix) {
 		var realUrl = url;
-		if(prefix === 'www.'){
+		if(urlPrefix === 'www.'){
 			realUrl = 'http://'+url;
 		}
 		return prefix + realUrl + postfix;
