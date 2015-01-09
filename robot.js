@@ -57,6 +57,14 @@ helper.fs.writeLine = function(content){
 	fs.appendFileSync(currentFile,content.replace(/\n/g,' ')+'\n');
 };
 
+helper.fs.getAllFiles = function(){
+	var fs = require('fs');
+	var path = require('path');
+	var allFiles = fs.readdirSync(helper.fs._folder);
+	return allFiles.filter(function(file){
+		return /\.md$/.test(file) && fs.statSync(path.join(helper.fs._folder,file)).isFile();
+	});
+};
 
 helper.fs.deleteLastLine = function(content){
 	var currentFile = this.getCurrentFileName();
@@ -65,7 +73,8 @@ helper.fs.deleteLastLine = function(content){
 
 helper.fs.searchLinesInFile = function(file,keywords){
 	var fs = require('fs');
-	var allLines = fs.readFileSync(file).split('\n');
+	var path = require('path');
+	var allLines = fs.readFileSync(path.join(helper.fs._folder,file),'utf-8').split('\n');
 	var ret = allLines.filter(function(fileLine){
 		return keywords.every(function(keyword){
 			return fileLine.toLowerCase().indexOf(keyword.toLowerCase()) > -1;
@@ -195,49 +204,13 @@ robot.commands['no-toosolo'] = robot.commands.闭嘴;
 robot.commands.no_toosolo = robot.commands.闭嘴;
 
 robot.commands.历史 = function(content,nick,uid,callback){
-	//readAllOldFiles(title,new Date().getTime());
-		
-		/*var fs,searchfile,alreadyRead,checkFinished;
-		var files = [];
-		var bkcontent = '查询结果:\n';
-		alreadyRead = 1;
-		fs = require('fs');
-		fs.readdir('./daily-welfare', function(err, fd) {
-			if(err) return;
-			for (var file in fd) {
-				if (helper.getRegExp('.md$','').test(fd[file])){
-					files.push(fd[file]);
-					searchfile(fd[file],title);
-				}
-		  }
-		});
-		searchfile = function(name,title) {
-			title = title.trim().split(',');
-			fs.readFile('./daily-welfare/'+name,function(err,data){
-				var lines = data.toString().split('\n');
-				lines.forEach(function(line){
-					if (line[0] == '-') {
-						var keywordsCount = 0;
-						title.forEach(function(titleItem){
-							if (line.toLowerCase().indexOf(titleItem) > -1) {
-								keywordsCount++;
-							}
-						});
-						if (keywordsCount === title.length) {
-							bkcontent += line.replace('- [','').replace('](','\n').replace(')','')+'\n';
-						}
-					}
-				});
-				alreadyRead++;
-				checkFinished();
-			});
-		};
-		checkFinished = function() {
-			if (alreadyRead === files.length) {
-				reply(bkcontent);
-				console.log(new Date().getTime()-time);
-			}
-		};*/
+
+	var allFiles = helper.fs.getAllFiles();
+	var ret = ['每日福利历史记录搜索结果：'];
+	allFiles.forEach(function(file){
+		ret = ret.concat(helper.fs.searchLinesInFile(file,content.split(',')));
+	});	
+	callback(ret.join('\n'));
 };
 robot.commands.记录 = robot.commands.历史;
 robot.commands.history = robot.commands.历史;
