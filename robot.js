@@ -175,7 +175,7 @@ robot.commands.聊天 = function(content,nick,uid,callback){
 		window.apikey + '&userid=' + encodeURI(uid) +
 		'&info='+encodeURI(content);
 	helper.ajax(url,function(msg){
-		callback('@' + 'nick ' + msg);
+		callback('@' + nick + ' ' + msg);
 	});
 };
 robot.commands.toosolo = robot.commands.聊天;
