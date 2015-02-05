@@ -100,7 +100,7 @@ robot.parseMessage = function(content, nick, uid){
 	var keywords = [
 		'@toosolo','@聊天','@天气',
 		'@闭嘴','@no-toosolo','@no_toosolo','@no','@shut',
-		'@福利','@分享','@share',
+		'@福利','@分享','@share','#每日福利#',
 		'@历史','@记录','@history',
 		'@撤回','@撤销'
 	];
@@ -112,9 +112,10 @@ robot.parseMessage = function(content, nick, uid){
 		}
 	});
 
-	if(!command && helper.testUrl(content)){
+	//2015-02-05 屏蔽自动链接获取
+	/*if(!command && helper.testUrl(content)){
 		command = '福利';
-	}
+	}*/
 	
 	var ret;
 	if(command){
@@ -184,7 +185,7 @@ robot.commands.天气 = function(content,nick,uid,callback){
 };
 
 robot.commands.福利 = function(content,nick,uid,callback){
-	var logContent = nick + '(' + uid + '):';
+	var logContent = '- ' + nick + ':';
 	if(/#每日福利#/.test(content)){
 		logContent = '【每日福利】';
 	}
