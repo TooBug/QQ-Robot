@@ -50,7 +50,7 @@ helper.fs.getCurrentFileName = function(){
 	var year = today.getFullYear();
 	var month = today.getMonth() + 1;
 	var path = require('path');
-	return path.join(this._folder,year + (month < 10?'0':'') + month + '.md');
+	return path.join(this._folder,year + '-' + (month < 10?'0':'') + month + '.md');
 };
 
 helper.fs.writeLine = function(content){
@@ -109,6 +109,9 @@ robot.parseMessage = function(content, nick, uid){
 	keywords.forEach(function(keyword){
 		if(content.toLowerCase().indexOf(keyword) > -1){
 			command = keyword.substr(1);
+			if(command === '每日福利#'){
+				command = '福利';
+			}
 		}
 	});
 
