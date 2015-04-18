@@ -188,11 +188,12 @@ robot.commands.天气 = function(content,nick,uid,callback){
 };
 
 robot.commands.福利 = function(content,nick,uid,callback){
-	var logContent = '- ' + nick + ':';
-	if(/#每日福利#/.test(content)){
-		logContent = '【每日福利】';
-	}
+	var logContent = '- ';
+	// if(/#每日福利#/.test(content)){
+		// logContent = '【每日福利】';
+	// }
 	logContent += helper.wrapUrl(content,'<','>');
+	logContent += '（' +  nick + '）';
 	helper.fs.writeLine(logContent);
 	setTimeout(function(){
 		callback('@' + nick + '，刚分享的福利已记录。');
